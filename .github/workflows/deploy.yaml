@@ -1,0 +1,43 @@
+name: CI/CD for Build and Deploy Wisecow
+
+on:
+  push:
+    branches:
+      - main  # or your desired branch
+
+env:
+  IMAGE_NAME: wisecow-app
+  REGISTRY: docker.io
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Log in to DockerHub
+      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest .
+
+    - name: Push Docker image to DockerHub
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest
+
+    - name: Set up Kubeconfig
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+
+    - name: Check deployment rollout status
+      run: |
+        kubectl rollout status deployment/wisecow-app  # <-- Make sure this matches your actual Deployment name
