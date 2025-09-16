@@ -7,7 +7,7 @@ spec:
     app: wisecow
   ports:
     - protocol: TCP
-      port: 4499
-      targetPort: 4499
-      nodePort: 30499
+      port: 4499        # Cluster internal
+      targetPort: 4499  # Container port
+      nodePort: 30499   # Fixed NodePort
   type: NodePort
