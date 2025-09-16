@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: wisecow
-          image: wisecow-app:latest
+          image: naveenm323/wisecow-app:latest
           ports:
             - containerPort: 4499
           readinessProbe:
