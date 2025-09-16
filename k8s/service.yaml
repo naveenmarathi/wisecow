@@ -9,4 +9,5 @@ spec:
     - protocol: TCP
       port: 4499
       targetPort: 4499
+      nodePort: 30499
   type: NodePort
