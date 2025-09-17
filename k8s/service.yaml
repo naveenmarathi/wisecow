@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: wisecow-app
 spec:
-  type: LoadBalancer   # 👈 change from NodePort
+  type: NodePort   # 👈 change to NodePort
   selector:
-    app: wisecow
+    app: wisecow-app
   ports:
     - port: 4499
       targetPort: 4499
