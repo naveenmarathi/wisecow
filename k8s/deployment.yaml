@@ -1,13 +1,21 @@
-         
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: wisecow-app
-spec:
-  type: LoadBalancer
-  selector:
+  name: wisecow-deployment
+  labels:
     app: wisecow-app
-  ports:
-    - protocol: TCP
-      port: 4499
-      targetPort: 4499
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  wisecow-app
+  template:
+    metadata:
+      labels:
+        app:  wisecow-app
+    spec:
+      containers:
+        - name:  wisecow-app
+          image: naveenm323/wisecow-app
+          ports:
+            - containerPort: 4499 
