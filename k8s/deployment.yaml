@@ -3,29 +3,20 @@ kind: Deployment
 metadata:
   name: wisecow-deployment
   labels:
-    app: wisecow
+    app: wisecow-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: wisecow
+      app:  wisecow-app
   template:
     metadata:
       labels:
-        app: wisecow
+        app:  wisecow-app
     spec:
       containers:
-        - name: wisecow
-          image: naveenm323/wisecow-app:latest
+        - name:  wisecow-app
+          image: naveenm323/wisecow-app
           ports:
             - containerPort: 4499
-          readinessProbe:
-            tcpSocket:
-              port: 4499
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            tcpSocket:
-              port: 4499
-            initialDelaySeconds: 10
-            periodSeconds: 20
+          
