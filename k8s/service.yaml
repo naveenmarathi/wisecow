@@ -3,9 +3,10 @@ kind: Service
 metadata:
   name: wisecow-app
 spec:
-  type: NodePort   # 👈 change to NodePort
+  type: NodePort
   selector:
     app: wisecow-app
   ports:
-    - port: 4499
-      targetPort: 4499
+    - port: 4499        # Service Port
+      targetPort: 4499  # Container Port
+      nodePort: 30499
