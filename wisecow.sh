@@ -12,15 +12,15 @@ get_api() {
 }
 
 handleRequest() {
-    get_api
-    mod=$(fortune)
+    # 1) Process the request
+	get_api
+	mod=`fortune`
 
-cat <<EOF
-HTTP/1.1 200 OK
-Content-Type: text/html; charset=UTF-8
-Connection: close
+cat <<EOF > $RSPFILE
+HTTP/1.1 200
 
-<pre>$(cowsay "$mod")</pre>
+
+<pre>`cowsay $mod`</pre>
 EOF
 }
 
