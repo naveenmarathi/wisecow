@@ -29,7 +29,7 @@ Follow these steps to deploy the WiseCow application:
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/your/repository.git
+   (https://github.com/naveenmarathi/wisecow.git)
    ```
 
 2. Navigate to the cloned repository:
