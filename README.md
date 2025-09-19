@@ -208,7 +208,7 @@ spec:
 
 - In production, use a valid CA-issued certificate to avoid browser warnings.
 
-## Benefits
+# Benefits
 
 - Secure communication: All traffic is encrypted with TLS.
 
