@@ -1,36 +1,45 @@
-name: CI/CD for Go Web App
+name: CI/CD for Wisecow Go App
 
 on:
   push:
     branches:
-      - main  # or your desired branch
+      - main   # Trigger only on pushes to main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. Checkout repo
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # 2. Log in to DockerHub
     - name: Log in to DockerHub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+    # 3. Build & push Docker image
     - name: Build and push Docker image
       run: |
-        docker build -t naveenm323/wisecow-app:latest .
-        docker push naveenm323/wisecow-app:latest
+        IMAGE_NAME=naveenm323/wisecow-app
+        GIT_SHA=${{ github.sha }}
+        docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$GIT_SHA .
+        docker push $IMAGE_NAME:latest
+        docker push $IMAGE_NAME:$GIT_SHA
 
+    # 4. Set up kubeconfig
     - name: Set up Kubeconfig
       run: |
         mkdir -p $HOME/.kube
         echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
 
+    # 5. Deploy to Kubernetes
     - name: Deploy to Kubernetes
       run: |
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
 
-    - name: Check deployment rollout status
+    # 6. Check rollout status
+    - name: Verify Deployment Rollout
       run: |
-        kubectl rollout status deployment/wisecow-app
+        kubectl rollout status deployment/wisecow-deployment --timeout=60s
