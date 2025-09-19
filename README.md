@@ -131,6 +131,91 @@ pipeline {
 }
 ```
 
+### TLS & Ingress Configuration (HTTPS Access)
+
+- To ensure secure communication with the WiseCow application, you can expose the service over HTTPS using Kubernetes Ingress and TLS certificates.
+
+1. Generate TLS Certificates
+For Development (Minikube)
+
+- You can create a self-signed certificate:
+
+- openssl req -x509 -nodes -days 365 \
+  -newkey rsa:2048 \
+  -keyout tls.key \
+  -out tls.crt \
+  -subj "/CN=wisecow.local/O=wisecow"
+
+
+## Create a Kubernetes TLS secret:
+
+- kubectl create secret tls wisecow-tls --cert=tls.crt --key=tls.key
+
+- For Production
+
+- Use a trusted CA such as Let’s Encrypt or your organization’s certificates. Create the secret in the same way.
+
+2. Create an Ingress Resource
+```
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wisecow-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+        - wisecow.local  # Replace with your domain for production
+      secretName: wisecow-tls
+  rules:
+    - host: wisecow.local  # Replace with your domain in production
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wisecow-service
+                port:
+                  number: 80
+```
+
+4. Enable Ingress in Minikube
+- minikube addons enable ingress
+
+- Update your local /etc/hosts file to map the domain to Minikube IP:
+
+- sudo nano /etc/hosts
+
+- Add:
+
+- MINIKUBE_IP>  wisecow.local
+
+- Example:
+
+- 192.168.49.2  wisecow.local
+
+4. Access the Application
+
+- Open your browser:
+
+- https://wisecow.local
+
+
+- In Minikube (self-signed certificate), your browser may warn about an untrusted certificate—this is expected for development.
+
+- In production, use a valid CA-issued certificate to avoid browser warnings.
+
+## Benefits
+
+- Secure communication: All traffic is encrypted with TLS.
+
+- Flexible routing: Ingress allows routing multiple applications through the same domain/IP.
+
+- Production-ready: The same Ingress setup can be applied in cloud Kubernetes services like EKS, GKE, or AKS.
+
 ### Kubernetes Configuration
 
 Update the Kubernetes deployment files (`deployment.yaml`, `service.yaml`, etc.) with the following configurations:
