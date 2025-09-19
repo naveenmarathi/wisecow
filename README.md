@@ -68,50 +68,67 @@ Configure Jenkins to automate the following tasks:
 Jenkins file
 
 pipeline {
-  agent any
+    agent any
 
-  stages {
-    stage('Build Docker Image') {
-      steps {
-        script {
-          docker.build("vinodkhathi/vinod-img:latest")
+    environment {
+        IMAGE_NAME = "naveenm323/wisecow-app"
+        GIT_SHA = "${env.GIT_COMMIT}"   // Commit SHA for unique tagging
+    }
+
+    stages {
+        stage("Checkout Code") {
+            steps {
+                echo " Checking out source code"
+                checkout scm
+            }
         }
-      }
-    }
 
-    stage('Push Docker Image') {
-      steps {
-        script {
-          docker.withRegistry('https://index.docker.io/v1/', 'vinod_dockerhub') {
-            docker.image("vinodkhathi/vinod-img:latest").push()
-          }
+        stage("Docker Login") {
+            steps {
+                echo " Logging into DockerHub"
+                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+            }
         }
-      }
-    }
 
-    stage('Deploy to Kubernetes') {
-      steps {
-        script {
-          kubernetesDeploy(
-            kubeconfigId: 'kubeconfig',
-            configs: 'wisecow-deployment.yaml'
-          )
-          kubernetesDeploy(
-            kubeconfigId: 'kubeconfig',
-            configs: 'wisecow-service.yaml'
-          )
+        stage("Build & Push Docker Image") {
+            steps {
+                echo " Building and pushing Docker image"
+                sh """
+                    docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$GIT_SHA .
+                    docker push $IMAGE_NAME:latest
+                    docker push $IMAGE_NAME:$GIT_SHA
+                """
+            }
         }
-      }
-    }
-  }
 
-  post {
-    always {
-      echo 'Pipeline completed'
+        stage("Setup Kubeconfig") {
+            steps {
+                echo "⚙️ Setting up kubeconfig"
+                sh """
+                    mkdir -p \$HOME/.kube
+                    echo \$KUBE_CONFIG_DATA | base64 -d > \$HOME/.kube/config
+                """
+            }
+        }
+
+        stage("Deploy to Kubernetes") {
+            steps {
+                echo " Deploying to Kubernetes"
+                sh """
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                """
+            }
+        }
+
+        stage("Verify Rollout") {
+            steps {
+                echo " Verifying Deployment rollout"
+                sh "kubectl rollout status deployment/wisecow-deployment --timeout=60s"
+            }
+        }
     }
-  }
-}
-```
+}```
 
 ### Kubernetes Configuration
 
