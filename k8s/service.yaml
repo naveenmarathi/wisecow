@@ -1,12 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wisecow-app
+  name: wisecow-service
 spec:
-  type: LoadBalancer
   selector:
-    app: wisecow-app
+    app: wisecow-app     # 👈 must match the pod labels
   ports:
     - protocol: TCP
-      port: 4499
-      targetPort: 4499
+      port: 80           # Service port (clients will use this)
+      targetPort: 4499   # Must match containerPort from Deployment
+      nodePort: 30080    # 👈 Optional: fixed NodePort (range 30000–32767)
+  type: NodePort
