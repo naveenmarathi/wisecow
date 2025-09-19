@@ -8,14 +8,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app:  wisecow-app
+      app: wisecow-app
   template:
     metadata:
       labels:
-        app:  wisecow-app
+        app: wisecow-app
     spec:
       containers:
-        - name:  wisecow-app
-          image: naveenm323/wisecow-app
+        - name: wisecow-app
+          image: naveenm323/wisecow-app:latest
           ports:
-            - containerPort: 4499 
+            - containerPort: 4499   # 👈 clean int, no hidden characters
