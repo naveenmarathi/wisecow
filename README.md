@@ -128,7 +128,8 @@ pipeline {
             }
         }
     }
-}```
+}
+```
 
 ### Kubernetes Configuration
 
