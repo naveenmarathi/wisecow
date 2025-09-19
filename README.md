@@ -138,3 +138,20 @@ Update the Kubernetes deployment files (`deployment.yaml`, `service.yaml`, etc.)
 - Environment variables: Set any required environment variables for the application.
 - Resources: Define CPU and memory limits and requests for the application pods.
 
+Conclusion
+
+The WiseCow application has been successfully containerized using Docker and deployed into a Kubernetes cluster managed by Minikube. With the help of Jenkins CI/CD pipelines, the process of building, pushing Docker images, and rolling out Kubernetes deployments has been fully automated.
+
+Key outcomes of this setup:
+- Automated CI/CD: Every code push triggers a Jenkins pipeline that builds and publishes a new Docker image and updates the Kubernetes deployment.
+
+- Scalability: Kubernetes manages pods and services, allowing the application to scale easily as demand grows.
+
+- Portability: The containerized application can run not only on Minikube but also on any Kubernetes-based environment such as AWS EKS, GCP GKE, or Azure AKS with minimal changes.
+
+- Reliability: Rollout verification ensures that only healthy pods are deployed, reducing downtime during updates.
+
+- Flexibility: The service is exposed via a NodePort in Minikube, making the application accessible through a browser using the Minikube IP and assigned port.
+
+## Overall, this setup demonstrates an end-to-end DevOps workflow where Git, Jenkins, Docker, and Kubernetes work together to ensure smooth, reliable, and scalable deployments of the WiseCow application.
+
